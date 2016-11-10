@@ -10,4 +10,11 @@ Featured Google APIs:
 * [Firebase and GCM](https://firebase.google.com/)
 * [Sign In with Google](https://developers.google.com/identity/sign-in/android/)
 etc.
+
 List will be updated as more implementations are added.
+
+To get your API key and google-services.json,please follow [this tutorial](https://developers.google.com/android/guides/setup) on how to intergrate google service with the sample using the gradle plugin.
+
+Place your google-services.json in `/app` folder and your API key in `/app/src/debug/res/values/google_maps_api.xml` as described [here](https://developers.google.com/maps/documentation/android-api/signup)
+
+Please feel free to fork,change and create a pull request.
