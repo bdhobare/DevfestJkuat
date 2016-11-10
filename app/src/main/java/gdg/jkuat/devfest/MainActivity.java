@@ -11,6 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import gdg.jkuat.devfest.Utils.RoundedTransformation;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -39,6 +45,19 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View headerView=navigationView.getHeaderView(0);
+        ImageView profileImage=(ImageView)headerView.findViewById(R.id.header);
+        TextView userName=(TextView)headerView.findViewById(R.id.userName);
+
+        Picasso.with(this)
+                .load("http://i.imgur.com/DvpvklR.png")
+                .placeholder(R.mipmap.ic_launcher)
+                .transform(new RoundedTransformation(50, 4))
+                .resizeDimen(R.dimen.image_size, R.dimen.image_size)
+                .centerCrop()
+                .into(profileImage);
+
     }
 
     @Override
