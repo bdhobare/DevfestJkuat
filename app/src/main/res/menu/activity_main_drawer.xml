@@ -1,35 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <item android:title="Maps">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/cafe"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:title="Cafe" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/hospital"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="Hospital" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/university"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:title="University" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/bank"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
-    </group>
+            android:title="Bank" />
+    </item>
 
-    <item android:title="Communicate">
+    <item android:title="Mobile Vision">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:id="@+id/face"
+                android:icon="@drawable/ic_mood_black_24dp"
+                android:title="Face Detection" />
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:id="@+id/barcode"
+                android:icon="@drawable/ic_search_black_24dp"
+                android:title="Scan Barcode" />
+            <item
+                android:id="@+id/read_text"
+                android:icon="@drawable/ic_font_download_black_24dp"
+                android:title="Read Text"/>
         </menu>
     </item>
 
