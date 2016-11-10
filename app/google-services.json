@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "547127218484",
+    "project_id": "firebase-devfest"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547127218484:android:f611140f442b6d63",
+        "android_client_info": {
+          "package_name": "gdg.jkuat.devfest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "547127218484-2363erjhidqjm4omnorkt3cl53n871v8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "gdg.jkuat.devfest",
+            "certificate_hash": "93CBF8AAE22DCDC0CD6E372D40D30F734C6E4437"
+          }
+        },
+        {
+          "client_id": "547127218484-4n1bagso0d1mhml59u0mvq1h9k9n2bku.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNuO9L1YYP1iF70xTB56mPDwiGl5M2BGE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
