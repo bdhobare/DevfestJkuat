@@ -10,7 +10,7 @@ Featured Google APIs:
 * [Firebase](https://firebase.google.com/)
 
 List will be updated as more implementations are added.
-
+Download the complete apk [here](https://github.com/bdhobare/DevfestJkuat/blob/master/devfest.apk)
 To get your API key and google-services.json,please follow [this tutorial](https://developers.google.com/android/guides/setup) on how to intergrate google service with the sample using the gradle plugin.
 
 Place your google-services.json in `/app` folder and your API key in `strings.xml` as described [here](https://developers.google.com/maps/documentation/android-api/signup)
