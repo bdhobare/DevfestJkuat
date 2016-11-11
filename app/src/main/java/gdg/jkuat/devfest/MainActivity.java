@@ -1,5 +1,6 @@
 package gdg.jkuat.devfest;
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -8,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -66,7 +68,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import gdg.jkuat.devfest.Utils.RoundedTransformation;
+import gdg.jkuat.devfest.network.NetworkHandler;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -97,7 +106,9 @@ public class MainActivity extends AppCompatActivity
 
     PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
-
+    private ProgressDialog dialog;
+    private String baseString="https://maps.googleapis.com/maps/api/place/nearbysearch/json?";
+    private int radius=1000;
 
 
     @Override
@@ -110,6 +121,11 @@ public class MainActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        dialog=new ProgressDialog(this);
+        dialog.setMessage("Fetching...");
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(true);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -229,11 +245,10 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        String API_KEY="AIzaSyAsblIrddstN2kSZl-EL0GUbVufGOTLF28";
+        //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670,151.1957&radius=500&types=food&name=cruise&key=API_KEY
         switch (id){
             case R.id.my_location:
-
-                break;
-            case R.id.cafe:
                 try {
                     startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesRepairableException e) {
@@ -242,17 +257,28 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
                 break;
+            case R.id.cafe:
+                if (googleApiClient.isConnected()){
+                    new GetPlaces().execute(baseString+"key="+API_KEY+"&location="+latLng.latitude+","+latLng.longitude+"&radius="+radius+"&types=food");
+                }
+                break;
             case R.id.hospital:
-
+                if (googleApiClient.isConnected()){
+                    new GetPlaces().execute(baseString+"key="+API_KEY+"&location="+latLng.latitude+","+latLng.longitude+"&radius="+radius+"&types=hospital");
+                }
                 break;
             case R.id.university:
-
+                if (googleApiClient.isConnected()){
+                    new GetPlaces().execute(baseString+"key="+API_KEY+"&location="+latLng.latitude+","+latLng.longitude+"&radius="+radius+"&types=university");
+                }
                 break;
             case R.id.bank:
-
+                if (googleApiClient.isConnected()){
+                    new GetPlaces().execute(baseString+"key="+API_KEY+"&location="+latLng.latitude+","+latLng.longitude+"&radius="+radius+"&types=bank");
+                }
                 break;
             case R.id.face:
-
+                startActivity(new Intent(getApplicationContext(),FaceTrackerActivity.class));
                 break;
             case R.id.barcode:
 
@@ -362,7 +388,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-            //TODO imaplement
+            //TODO implement
     }
 
     @Override
@@ -446,22 +472,36 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    /** Called when the Clear button is clicked. */
-    public void onClearMap(View view) {
+    public void onClearMap() {
         if (!checkReady()) {
             return;
         }
         mMap.clear();
+        addCurrentLocation();
     }
 
-    /** Called when the Reset button is clicked. */
-    public void onResetMap(View view) {
+    public void onResetMap() {
         if (!checkReady()) {
             return;
         }
         // Clear the map because we don't want duplicates of the markers.
         mMap.clear();
-        addMarkersToMap();
+       addCurrentLocation();
+    }
+    private void addCurrentLocation(){
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.infoWindowAnchor(0.5f, 0.5f);
+        markerOptions.title("Your Current Position");
+        markerOptions.snippet("("+latLng.latitude+","+latLng.longitude);
+
+        currLocationMarker = mMap.addMarker(markerOptions);
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng).zoom(14).build();
+
+        mMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(cameraPosition));
     }
 
     /**
@@ -514,9 +554,11 @@ public class MainActivity extends AppCompatActivity
 
             int badge=R.mipmap.ic_launcher;
             ((ImageView) view.findViewById(R.id.badge)).setImageResource(badge);
+            Picasso.with(getApplicationContext()).load((String) marker.getTag()).placeholder(R.mipmap.ic_launcher).into(((ImageView) view.findViewById(R.id.badge)));
 
 
             TextView titleUi = ((TextView) view.findViewById(R.id.title));
+            titleUi.setText(marker.getTitle());
 
             //TODO put custom text to textview
 
@@ -530,6 +572,57 @@ public class MainActivity extends AppCompatActivity
                 snippetUi.setText("Unavailable");
             }
 
+        }
+    }
+
+    private class GetPlaces extends AsyncTask<String,Void,String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String result = new NetworkHandler().get(params[0]);
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            dialog.dismiss();
+            if ((s != null) && (!s.isEmpty())) {
+                Log.e("SEARCH",s);
+                Object object = null;
+                try {
+                    object = new JSONTokener(s).nextValue();
+                    if (object instanceof JSONObject) {
+                            processResult(new JSONObject(s));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    private void processResult(JSONObject object){
+        onClearMap();
+        try {
+            JSONArray array=object.getJSONArray("results");
+            for (int i=0;i<array.length();i++){
+                JSONObject location=array.getJSONObject(i).getJSONObject("geometry").getJSONObject("location");
+                LatLng lng=new LatLng(location.getDouble("lat"),location.getDouble("lng"));
+                MarkerOptions options=new MarkerOptions()
+                        .position(lng)
+                        .title(array.getJSONObject(i).getString("name"))
+                        .snippet("("+lng.latitude+","+lng.longitude)
+                        .infoWindowAnchor(0.5f, 0.5f);
+                Marker marker=mMap.addMarker(options);
+                marker.setTag(array.getJSONObject(i).getString("icon"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }
