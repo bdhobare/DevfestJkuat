@@ -3,20 +3,24 @@
 
     <item android:title="Maps">
         <item
+            android:id="@+id/my_location"
+            android:icon="@drawable/ic_place_black_24dp"
+            android:title="Where Am I" />
+        <item
             android:id="@+id/cafe"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_local_cafe_black_24dp"
             android:title="Cafe" />
         <item
             android:id="@+id/hospital"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_local_hospital_black_24dp"
             android:title="Hospital" />
         <item
             android:id="@+id/university"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_local_library_black_24dp"
             android:title="University" />
         <item
             android:id="@+id/bank"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_local_mall_black_24dp"
             android:title="Bank" />
     </item>
 
