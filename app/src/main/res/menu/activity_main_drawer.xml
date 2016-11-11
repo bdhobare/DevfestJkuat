@@ -34,10 +34,6 @@
                 android:id="@+id/barcode"
                 android:icon="@drawable/ic_search_black_24dp"
                 android:title="Scan Barcode" />
-            <item
-                android:id="@+id/read_text"
-                android:icon="@drawable/ic_font_download_black_24dp"
-                android:title="Read Text"/>
         </menu>
     </item>
 

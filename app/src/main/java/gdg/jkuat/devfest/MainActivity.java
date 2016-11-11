@@ -281,10 +281,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(getApplicationContext(),FaceTrackerActivity.class));
                 break;
             case R.id.barcode:
-
-                break;
-            case R.id.read_text:
-
+                startActivity(new Intent(getApplicationContext(),BarcodeActivity.class));
                 break;
             default:
                 return true;
