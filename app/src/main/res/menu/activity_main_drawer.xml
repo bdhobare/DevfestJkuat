@@ -5,7 +5,7 @@
         <item
             android:id="@+id/my_location"
             android:icon="@drawable/ic_place_black_24dp"
-            android:title="Where Am I" />
+            android:title="Place Picker" />
         <item
             android:id="@+id/cafe"
             android:icon="@drawable/ic_local_cafe_black_24dp"

@@ -3,15 +3,27 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -28,6 +40,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -39,10 +53,14 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -62,6 +80,25 @@ public class MainActivity extends AppCompatActivity
     LatLng latLng;
     Marker currLocationMarker;
     private  static final int PERMISSION_ACCESS_FINE_LOCATION=100;
+    private final int PLACE_PICKER_REQUEST = 200;
+
+    private Marker parliament;
+
+    private Marker jkuat;
+
+    private Marker kisumu;
+
+
+    private static final LatLng PARLIAMENT = new LatLng(1.289304, 36.819722);
+
+    private static final LatLng JKUAT = new LatLng(1.088066,37.010540);
+
+    private static final LatLng KISUMU = new LatLng(0.092482, 34.768379);
+
+    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +119,11 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
+
+        if (!isLocationPermissionGranted()){
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION },
+                    PERMISSION_ACCESS_FINE_LOCATION);
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -112,6 +154,27 @@ public class MainActivity extends AppCompatActivity
             //startActivity(new Intent(getApplicationContext(),MapsActivity.class));
         }else {
             return false;
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_ACCESS_FINE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // All good!
+                } else {
+                    Toast.makeText(this, "Devfest needs to access your location!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, this);
+                String toastMsg = String.format("Place: %s", place.getName());
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+            }
         }
     }
     protected void onStart() {
@@ -171,7 +234,13 @@ public class MainActivity extends AppCompatActivity
 
                 break;
             case R.id.cafe:
-
+                try {
+                    startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.hospital:
 
@@ -202,6 +271,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        //Log.e("CONNECTED","READY");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
@@ -211,8 +281,8 @@ public class MainActivity extends AppCompatActivity
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
                 markerOptions.infoWindowAnchor(0.5f, 0.5f);
-                markerOptions.title("Current Position");
-                markerOptions.snippet("No snippet");
+                markerOptions.title("Your Current Position");
+                markerOptions.snippet("("+lastLocation.getLatitude()+","+lastLocation.getLongitude());
 
                 currLocationMarker = mMap.addMarker(markerOptions);
 
@@ -222,7 +292,7 @@ public class MainActivity extends AppCompatActivity
 
                 mMap.animateCamera(CameraUpdateFactory
                         .newCameraPosition(cameraPosition));
-                //mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
+                mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
                 mMap.setOnMarkerClickListener(this);
                 mMap.setOnInfoWindowClickListener(this);
             }
@@ -287,12 +357,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-
+            //TODO update the marker
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-
+            //TODO imaplement
     }
 
     @Override
@@ -330,6 +400,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        //Log.e("MAP","READY");
         mMap = googleMap;
         mMap.setContentDescription("DevFest Jkuat");
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -340,12 +411,125 @@ public class MainActivity extends AppCompatActivity
 
             googleApiClient.connect();
         }
+        addMarkersToMap();
     }
+    private void addMarkersToMap() {
+        // Uses a colored icon.
+        parliament = mMap.addMarker(new MarkerOptions()
+                .position(PARLIAMENT)
+                .title("Parliament")
+                .snippet("Kenya")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+        // Uses a custom icon with the info window popping out of the center of the icon.
+        jkuat = mMap.addMarker(new MarkerOptions()
+                .position(JKUAT)
+                .title("JKUAT")
+                .snippet("Juja")
+                .infoWindowAnchor(0.5f, 0.5f));
+
+        // Creates a draggable marker. Long press to drag.
+         kisumu= mMap.addMarker(new MarkerOptions()
+                .position(KISUMU)
+                .title("Kisumu")
+                .snippet("Kisumu")
+                .draggable(true));
+
+    }
+
+
+    private boolean checkReady() {
+        if (mMap == null) {
+            Toast.makeText(this, "Map not ready", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+    /** Called when the Clear button is clicked. */
+    public void onClearMap(View view) {
+        if (!checkReady()) {
+            return;
+        }
+        mMap.clear();
+    }
+
+    /** Called when the Reset button is clicked. */
+    public void onResetMap(View view) {
+        if (!checkReady()) {
+            return;
+        }
+        // Clear the map because we don't want duplicates of the markers.
+        mMap.clear();
+        addMarkersToMap();
+    }
+
+    /**
+     * Demonstrates converting a {@link Drawable} to a {@link BitmapDescriptor},
+     * for use as a marker icon.
+     */
+    private BitmapDescriptor vectorToBitmap(@DrawableRes int id, @ColorInt int color) {
+        Drawable vectorDrawable = ResourcesCompat.getDrawable(getResources(), id, null);
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        DrawableCompat.setTint(vectorDrawable, color);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+
     protected synchronized void buildGoogleApiClient() {
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+    }
+    class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+
+
+        private final View mWindow;
+
+        private final View mContents;
+
+        CustomInfoWindowAdapter() {
+            mWindow = getLayoutInflater().inflate(R.layout.custom_window, null);
+            mContents = getLayoutInflater().inflate(R.layout.custom_marker, null);
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            render(marker, mWindow);
+            return mWindow;
+        }
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            render(marker, mContents);
+            return mContents;
+        }
+        private void render(Marker marker, View view) {
+
+            int badge=R.mipmap.ic_launcher;
+            ((ImageView) view.findViewById(R.id.badge)).setImageResource(badge);
+
+
+            TextView titleUi = ((TextView) view.findViewById(R.id.title));
+
+            //TODO put custom text to textview
+
+            String snippet = marker.getSnippet();
+            TextView snippetUi = ((TextView) view.findViewById(R.id.coordinates));
+            if (snippet != null && snippet.length() > 0) {
+                SpannableString snippetText = new SpannableString(snippet);
+                snippetText.setSpan(new ForegroundColorSpan(Color.BLACK), 0, snippetText.length(), 0);
+                snippetUi.setText(snippetText);
+            } else {
+                snippetUi.setText("Unavailable");
+            }
+
+        }
     }
 }
