@@ -9,7 +9,7 @@ Featured Google APIs:
 * [Google Material Design](https://material.google.com/)
 * [Firebase](https://firebase.google.com/)
 
-Download the complete apk [here](http://play.google.com/store/apps/details?id=gdg.jkuat.devfest).
+Download the app from playstore [here](http://play.google.com/store/apps/details?id=gdg.jkuat.devfest).
 
 ##Building:
 
