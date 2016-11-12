@@ -67,6 +67,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -83,6 +85,7 @@ public class MainActivity extends AppCompatActivity
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,GoogleMap.OnMarkerClickListener {
+
     private GoogleMap mMap;
     private GoogleApiClient googleApiClient;
     LocationRequest mLocationRequest;
@@ -110,7 +113,7 @@ public class MainActivity extends AppCompatActivity
     private String baseString="https://maps.googleapis.com/maps/api/place/nearbysearch/json?";
     private int radius=1000;
 
-
+    private static final String TAG = MainActivity.class.getName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,16 +129,30 @@ public class MainActivity extends AppCompatActivity
         dialog.setMessage("Fetching...");
         dialog.setIndeterminate(true);
         dialog.setCancelable(true);
-
+        // If a notification message is tapped, any data accompanying the notification
+        // message is available in the intent extras. In this sample the launcher
+        // intent is fired when the notification is tapped, so any accompanying data would
+        // be handled here. If you want a different intent fired, set the click_action
+        // field of the notification message to the desired intent. The launcher intent
+        // is used when no click_action is specified.
+        //
+        // Handle possible data accompanying notification message.
+        if (getIntent().getExtras() != null) {
+            for (String key : getIntent().getExtras().keySet()) {
+                Object value = getIntent().getExtras().get(key);
+                Log.d(TAG, "Key: " + key + " Value: " + value);
+            }
+        }
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                String token = FirebaseInstanceId.getInstance().getToken();
+                String msg = getString(R.string.msg_token_fmt, token);
+                Log.d(TAG, msg);
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
             }
         });
-
         if (!isLocationPermissionGranted()){
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION },
                     PERMISSION_ACCESS_FINE_LOCATION);
@@ -161,7 +178,22 @@ public class MainActivity extends AppCompatActivity
                 .resizeDimen(R.dimen.image_size, R.dimen.image_size)
                 .centerCrop()
                 .into(profileImage);
+        //TODO remove this.Test
+        userName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+            }
+        });
+        subscribe();
+
+    }
+    public void subscribe(){
+        // [START subscribe_topics]
+        FirebaseMessaging.getInstance().subscribeToTopic("news");
+        String msg = "Subscribed to notifications.";
+        Log.d(TAG, msg);
+        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
     }
     public boolean isLocationPermissionGranted(){
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
