@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "547127218484-44d2dlv6d2in0kpcqhopmdmkagv5mf21.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "gdg.jkuat.devfest",
+            "certificate_hash": "D039E3887D0DC180DA4C7CD5E2643BD9E7005F46"
+          }
+        },
+        {
           "client_id": "547127218484-2363erjhidqjm4omnorkt3cl53n871v8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

@@ -290,22 +290,22 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
             case R.id.cafe:
-                if (googleApiClient.isConnected()){
+                if (googleApiClient.isConnected() && (latLng !=  null)){
                     new GetPlaces().execute(baseString+"key="+API_KEY+"&location="+latLng.latitude+","+latLng.longitude+"&radius="+radius+"&types=food");
                 }
                 break;
             case R.id.hospital:
-                if (googleApiClient.isConnected()){
+                if (googleApiClient.isConnected()&&(latLng !=  null)){
                     new GetPlaces().execute(baseString+"key="+API_KEY+"&location="+latLng.latitude+","+latLng.longitude+"&radius="+radius+"&types=hospital");
                 }
                 break;
             case R.id.university:
-                if (googleApiClient.isConnected()){
+                if (googleApiClient.isConnected()&&(latLng !=  null)){
                     new GetPlaces().execute(baseString+"key="+API_KEY+"&location="+latLng.latitude+","+latLng.longitude+"&radius="+radius+"&types=university");
                 }
                 break;
             case R.id.bank:
-                if (googleApiClient.isConnected()){
+                if (googleApiClient.isConnected()&&(latLng !=  null)){
                     new GetPlaces().execute(baseString+"key="+API_KEY+"&location="+latLng.latitude+","+latLng.longitude+"&radius="+radius+"&types=bank");
                 }
                 break;
