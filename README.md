@@ -11,7 +11,7 @@ Featured Google APIs:
 
 Download the app from playstore [here](http://play.google.com/store/apps/details?id=gdg.jkuat.devfest).
 
-##Building:
+## Building:
 
 To get your API key and google-services.json,please follow [this tutorial](https://developers.google.com/android/guides/setup) on how to intergrate google service with the sample using the gradle plugin.
 
